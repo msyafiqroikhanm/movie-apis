@@ -1,7 +1,7 @@
-const ImportController = require('../controllers/movie.controller');
 const router = require('express').Router();
 const multer = require('multer');
 const storage = require('../helpers/multerStorage.helper');
+const MovieController = require('../controllers/movie.controller');
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
@@ -23,6 +23,7 @@ const upload = multer({
   },
 });
 
-router.post('/', upload.single('file'), ImportController.import);
+router.get('/', MovieController.getAll);
+router.post('/', MovieController.create);
 
 module.exports = router;

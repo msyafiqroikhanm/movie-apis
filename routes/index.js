@@ -1,11 +1,8 @@
 require('dotenv').config();
 const router = require('express').Router();
-const ImportController = require('../controllers/import.controller');
-const importRoutes = require('./import.route');
+const movieRoutes = require('./movie.routes');
 
 router.get('/', (req, res) => res.send(`${process.env.APP_NAME} App `));
-router.use('/import', importRoutes);
-router.put('/random-dates', ImportController.random);
-router.put('/rollback-dates', ImportController.rollbackDate);
+router.use('/movies', movieRoutes);
 
 module.exports = router;
