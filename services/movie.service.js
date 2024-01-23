@@ -1,27 +1,25 @@
+const deleteFile = require('../helpers/deleteFile.helper');
 const { Movie } = require('../models');
+const { relative } = require('path');
 
 // * Movie
 const selectAllMovies = async (where) => {
   const movieInstance = await Movie.findAll({
     where,
-    order: [
-      ['locationId', 'ASC'],
-      ['name', 'ASC'],
-    ],
   });
 
   return {
     success: true,
-    message: 'Successfully Getting All Movie',
+    message: 'Successfully Getting All Movies',
     content: movieInstance,
   };
 };
 
 const selectMovie = async (where) => {
-  const locationType = await Movie.findOne({
+  const movieInstance = await Movie.findOne({
     where,
   });
-  if (!locationType) {
+  if (!movieInstance) {
     return {
       success: false,
       message: ['Movie Data Not Found'],
@@ -30,37 +28,13 @@ const selectMovie = async (where) => {
 
   return {
     success: true,
-    message: 'Successfully Getting All Movie',
-    content: locationType,
+    message: 'Successfully Getting Data Movie',
+    content: movieInstance,
   };
 };
 
-const createMovie = async (form) => {
-  const locationInstance = await ACM_Location.findOne({ where: { id: form.locationId } });
-  if (!locationInstance) {
-    return {
-      success: false,
-      code: 404,
-      message: ['Location Data Not Found'],
-    };
-  }
-
-  //* Unique By Name and Location Check
-  const Movie = await Movie.findOne({
-    where: { locationId: locationInstance.id, name: { [Op.substring]: form.name } },
-  });
-  if (Movie) {
-    return {
-      success: false,
-      code: 400,
-      message: ['Movie Already Exists'],
-    };
-  }
-
-  const movieInstance = await Movie.create({
-    name: form.name,
-    locationId: form.locationId,
-  });
+const insertMovie = async (form) => {
+  const movieInstance = await Movie.create(form);
 
   return {
     success: true,
@@ -69,9 +43,8 @@ const createMovie = async (form) => {
   };
 };
 
-const updateMovie = async (where, form) => {
-  // check identity type id validity
-  const movieInstance = await Movie.findOne({ where });
+const updateMovie = async (id, form) => {
+  const movieInstance = await Movie.findOne({ where: { id } });
   if (!movieInstance) {
     return {
       success: false,
@@ -79,18 +52,13 @@ const updateMovie = async (where, form) => {
     };
   }
 
-  if (form.locationId) {
-    const locationInstance = await ACM_Location.findOne({ where: { id: form.locationId } });
-    if (!locationInstance) {
-      return {
-        success: false,
-        message: ['Location Data Not Found'],
-      };
-    }
+  if (form.image) {
+    await deleteFile(relative(__dirname, movieInstance.image));
   }
-
-  movieInstance.locationId = form.locationId;
-  movieInstance.name = form.name;
+  movieInstance.title = form.title || movieInstance.title;
+  movieInstance.description = form.description || movieInstance.description;
+  movieInstance.rating = form.rating || movieInstance.rating;
+  movieInstance.image = form.image || movieInstance.image;
   await movieInstance.save();
 
   return {
@@ -100,33 +68,30 @@ const updateMovie = async (where, form) => {
   };
 };
 
-const deleteMovie = async (where) => {
+const deleteMovie = async (id) => {
   // check identity type id validity
-  const bedInstance = await Movie.findOne({ where });
-  if (!bedInstance) {
+  const movieInstance = await Movie.findOne({ where: { id } });
+  if (!movieInstance) {
     return {
       success: false,
       message: ['Movie Data Not Found'],
     };
   }
-  // * Update dependencies data
-  await ACM_Room.update({ bedId: null }, { where: { bedId: bedInstance.id } });
 
-  const { name } = bedInstance.dataValues;
-
-  await bedInstance.destroy();
+  await deleteFile(relative(__dirname, movieInstance.image));
+  await movieInstance.destroy();
 
   return {
     success: true,
     message: 'Movie Successfully Deleted',
-    content: `Movie ${name} Successfully Deleted`,
+    content: `Movie Successfully Deleted`,
   };
 };
 
 module.exports = {
   selectAllMovies,
   selectMovie,
-  createMovie,
+  insertMovie,
   updateMovie,
   deleteMovie,
 };
