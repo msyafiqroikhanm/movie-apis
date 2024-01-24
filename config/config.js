@@ -23,6 +23,7 @@ module.exports = {
     database: process.env.TEST_DB_NAME,
     host: process.env.TEST_DB_HOST,
     dialect: process.env.TEST_DB_DIALECT,
+    logging: false,
     timezone: '+07:00', //
   },
 };
