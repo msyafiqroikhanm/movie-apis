@@ -5,6 +5,7 @@ const routes = require('./routes');
 const morgan = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 
 app.use(
   morgan('common', {
@@ -15,7 +16,7 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use(routes);
 app.use(errorHandling);

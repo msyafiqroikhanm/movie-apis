@@ -2,8 +2,10 @@ const request = require('supertest');
 const { sequelize } = require('../models/index');
 const { queryInterface } = sequelize;
 const app = require('../app');
-// sebelum test, kita butuh data user
-let token;
+const path = require('path');
+
+const currentDirectory = __dirname;
+const parentDirectory = path.join(currentDirectory, '..');
 
 beforeEach(async () => {
   await queryInterface.bulkInsert('Movies', [
@@ -40,10 +42,7 @@ describe('POST Movie', () => {
         rating: 7,
         image: 'public/images/image-1706004424779-8-7JnDb8Dfd2WXePk.png',
       })
-      .attach(
-        'image',
-        'C:\\projects\\movies-api\\public\\images\\image-1706003399950-8-7JnDb8Dfd2WXePk.png',
-      )
+      .attach('image', `${parentDirectory}/example-photo.png`)
       .end((err, res) => {
         if (err) {
           done(err);
@@ -175,10 +174,7 @@ describe('UPDATE Movie', () => {
         rating: 7,
         image: 'public/images/image-1706004424779-8-7JnDb8Dfd2WXePk.png',
       })
-      //   .attach(
-      //     'image',
-      //     'C:\\projects\\movies-api\\public\\images\\image-1706003399950-8-7JnDb8Dfd2WXePk.png',
-      //   )
+      //   .attach('image', `${parentDirectory}/example-photo.png`)
       .end((err, res) => {
         if (err) {
           done(err);
@@ -205,10 +201,7 @@ describe('UPDATE Movie', () => {
         rating: 7,
         image: 'public/images/image-1706004424779-8-7JnDb8Dfd2WXePk.png',
       })
-      .attach(
-        'image',
-        'C:\\projects\\movies-api\\public\\images\\image-1706003399950-8-7JnDb8Dfd2WXePk.png',
-      )
+      //   .attach('image', `${parentDirectory}/example-photo.png`)
       .end((err, res) => {
         if (err) {
           done(err);
